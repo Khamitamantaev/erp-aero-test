@@ -2,12 +2,12 @@ const express = require("express");
 const cors = require("cors");
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
-  }
+}
 
 const app = express();
 
 var corsOptions = {
-  origin: "http://localhost:8081"
+    origin: "http://localhost:8081"
 };
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -18,27 +18,31 @@ const User = db.user;
 
 
 
-db.sequelize.sync({force: true}).then(() => {
-  console.log('Dropped User');
-  init();
+db.sequelize.sync({ force: true }).then(() => {
+    console.log('Dropped User');
+    init();
 });
 
-function init() {
-    User.create({
-      username: 'khamitamantaev',
-      password: '123321',
-      email: 'khamitamantaev@gmail.com'
+async function init() {
+    const [user, created] = await User.findOrCreate({
+        where: { username: 'khamitamantaev' },
+        defaults: {
+            username: 'khamitamantaev',
+            password: '123321',
+            email: 'khamitamantaev@gmail.com'
+        }
     });
-  }
+    console.log('created or find user with username: ', user.username)
+}
 
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to erp-aero test application." });
+    res.json({ message: "Welcome to erp-aero test application." });
 });
 
-//CHECK PORT ENV
+// CHECK PORT .ENV
 console.log(process.env.PORT)
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
+    console.log(`Server is running on port ${PORT}.`);
 });
