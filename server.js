@@ -13,6 +13,24 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const db = require("./models");
+const User = db.user;
+
+
+
+db.sequelize.sync({force: true}).then(() => {
+  console.log('Dropped User');
+  init();
+});
+
+function init() {
+    User.create({
+      username: 'khamitamantaev',
+      password: '123321',
+      email: 'khamitamantaev@gmail.com'
+    });
+  }
+
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to erp-aero test application." });
 });
