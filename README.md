@@ -1,2 +1,10 @@
-# erp-aero-test
-Техническое задание для ERP AERO
+# Erp-aero-test
+
+Erp-aero-test is Application for test
+
+## Installation
+
+Use the [docker-compose](https://docs.docker.com/compose/) to install image.
+```bash
+docker-compose up -d
+npm install
