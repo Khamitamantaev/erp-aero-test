@@ -16,8 +16,6 @@ app.use(express.urlencoded({ extended: true }));
 const db = require("./models");
 const User = db.user;
 
-
-
 db.sequelize.sync({ force: true }).then(() => {
     console.log('Dropped User');
     init();
@@ -25,19 +23,18 @@ db.sequelize.sync({ force: true }).then(() => {
 
 async function init() {
     const [user, created] = await User.findOrCreate({
-        where: { username: 'khamitamantaev' },
+        where: { id: 'khamitamantaev' },
         defaults: {
-            username: 'khamitamantaev',
+            id: 'khamitamantaev',
             password: '123321',
-            email: 'khamitamantaev@gmail.com'
         }
     });
-    console.log('created or find user with username: ', user.username)
+    console.log('created or find user with id: ', user.id)
 }
 
-app.get("/", (req, res) => {
-    res.json({ message: "Welcome to erp-aero test application." });
-});
+//routes
+require('./routes/auth.routes')(app);
+// require('./routes/user.routes')(app);
 
 // CHECK PORT .ENV
 console.log(process.env.PORT)
