@@ -1,0 +1,19 @@
+{
+  "name": "erp-aero-test",
+  "version": "1.0.0",
+  "description": "This is test application for erp-aero",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Khamitamantaev/erp-aero-test.git"
+  },
+  "author": "KhamitAmantaev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Khamitamantaev/erp-aero-test/issues"
+  },
+  "homepage": "https://github.com/Khamitamantaev/erp-aero-test#readme"
+}
