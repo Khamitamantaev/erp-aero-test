@@ -1,4 +1,13 @@
 const controller = require("../controllers/auth.controller");
+const { body } = require('express-validator');
+const e = require("cors");
+
+const validate = (data) => {
+    if (!/^([0-9]{9})|([A-Za-z0-9._%\+\-]+@[a-z0-9.\-]+\.[a-z]{2,3})$/.test(data)) {
+        return false;
+    }
+    return true
+};
 
 module.exports = function (app) {
     app.use(function (req, res, next) {
@@ -11,6 +20,9 @@ module.exports = function (app) {
 
     app.post(
         "/signup",
+        body('id').custom(value => {
+            return validate(value)
+        }),
         controller.signup
     );
 

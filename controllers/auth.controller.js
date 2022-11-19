@@ -3,9 +3,13 @@ const config = require("../config/auth.config");
 const { user: User, refreshToken: RefreshToken } = db;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { validationResult } = require('express-validator');
 
 exports.signup = async (req, res) => {
-
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     const user = await User.findOne({
         where: {
             id: req.body.id
