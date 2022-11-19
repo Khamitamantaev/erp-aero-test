@@ -26,7 +26,7 @@ async function init() {
         where: { id: 'khamitamantaev' },
         defaults: {
             id: 'khamitamantaev',
-            password: bcrypt.hashSync(process.env.ROOT_PASSWORD, 8)
+            password: bcrypt.hashSync(process.env.USER_PASSWORD, 8)
         }
     });
     console.log('created or find user with id: ', user.id)
