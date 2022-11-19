@@ -2,23 +2,30 @@ const jwt = require("jsonwebtoken");
 const authConfig = require("../config/auth.config.js");
 
 verifyToken = (req, res, next) => {
-  let token = req.headers["x-access-token"];
+ 
+  try {
+    let token = req.header("Authorization");
 
-  if (!token) {
-    return res.status(403).send({
-      message: "No token!"
-    });
-  }
-
-  jwt.verify(token, authConfig.access_secret, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({
-        message: "Unauthorized!"
-      });
+    if (!token) {
+      return res.status(403).send("Access Denied");
     }
-    req.userId = decoded.id;
-    next();
-  });
+
+    if (token.startsWith("Bearer ")) {
+      token = token.slice(7, token.length).trimLeft();
+    }
+
+    jwt.verify(token, authConfig.access_secret, (err, decoded) => {
+      if (err) {
+        return res.status(401).send({
+          message: "Unauthorized!"
+        });
+      }
+      req.userId = decoded.id;
+      next();
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 const authJwt = {
