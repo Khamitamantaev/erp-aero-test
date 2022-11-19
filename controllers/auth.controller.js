@@ -61,6 +61,10 @@ exports.signup = async (req, res) => {
 };
 
 exports.signin = (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     User.findOne({
         where: {
             id: req.body.id
@@ -104,7 +108,7 @@ exports.refresh = async (req, res) => {
 
     const requestToken = req.params.new_token;
 
-    console.log('Текущий токен: ', requestToken)
+    console.log('Current token: ', requestToken)
 
     if (requestToken == null) {
         return res.status(403).json({ message: "Refresh Token is empty!" });

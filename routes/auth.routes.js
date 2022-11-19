@@ -28,5 +28,7 @@ module.exports = function (app) {
 
     app.post("/signin/:new_token", controller.refresh)
 
-    app.post("/signin", controller.signin);
+    app.post("/signin", body('id').custom(value => {
+        return validate(value)
+    }), controller.signin);
 };
