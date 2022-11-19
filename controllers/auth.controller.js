@@ -40,7 +40,7 @@ exports.signup = async (req, res) => {
 
             let access_token = jwt.sign({ id: user.id }, config.access_secret, {
                 // expiresIn: 60 // 1 min+ test
-                expiresIn: 60
+                expiresIn: config.jwtExpiration
             });
 
             let refresh_token = await RefreshToken.createToken(user);
@@ -81,7 +81,7 @@ exports.signin = (req, res) => {
 
             let access_token = jwt.sign({ id: user.id }, config.access_secret, {
                 // expiresIn: 60 // 1 min+
-                expiresIn: 60
+                expiresIn: config.jwtExpiration
             });
 
             let refresh_token = await RefreshToken.createToken(user);
