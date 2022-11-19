@@ -1,6 +1,6 @@
 const db = require("../models");
 const config = require("../config/auth.config");
-const User = db.user;
+const {user: User, refreshToken: RefreshToken} = db;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
@@ -37,7 +37,7 @@ exports.signin = (req, res) => {
             id: req.body.id
         }
     })
-        .then(user => {
+        .then(async user => {
             if (!user) {
                 return res.status(404).send({ message: "User Not found." });
             }
@@ -59,13 +59,11 @@ exports.signin = (req, res) => {
                 expiresIn: 60
             });
 
-            let refresh_token = jwt.sign({ id: user.id }, config.refresh_secret, {
-                expiresIn: 600 // 10 min+
-            });
+            let refresh_token = await RefreshToken.createToken(user);
 
             res.status(200).send({
                 accessToken: access_token,
-                refresh_token: refresh_token
+                refreshToken: refresh_token
             });
         })
         .catch(err => {
@@ -74,5 +72,42 @@ exports.signin = (req, res) => {
 };
 
 exports.refresh = async (req, res) => {
-    console.log(req.params.new_token)
+
+    const requestToken  = req.params.new_token;
+
+    console.log('Текущий токен: ', requestToken)
+
+  if (requestToken == null) {
+    return res.status(403).json({ message: "Refresh Token is empty!" });
+  }
+
+  try {
+    let refreshToken = await RefreshToken.findOne({ where: { token: requestToken } });
+
+    if (!refreshToken) {
+      res.status(403).json({ message: "Refresh token is not in database!" });
+      return;
+    }
+
+    if (RefreshToken.verifyExpiration(refreshToken)) {
+      RefreshToken.destroy({ where: { id: refreshToken.id } });
+      
+      res.status(403).json({
+        message: "Refresh token was expired. Please make a new signin request",
+      });
+      return;
+    }
+
+    const user = await refreshToken.getUser();
+    let newAccessToken = jwt.sign({ id: user.id }, config.access_secret, {
+      expiresIn: config.jwtExpiration,
+    });
+
+    return res.status(200).json({
+      accessToken: newAccessToken,
+      refreshToken: refreshToken.token,
+    });
+  } catch (err) {
+    return res.status(500).send({ message: err });
+  }
 }
