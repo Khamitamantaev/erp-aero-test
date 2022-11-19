@@ -35,6 +35,7 @@ async function init() {
 //routes
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
+require('./routes/file.routes.js')(app);
 
 // CHECK PORT .ENV
 console.log(process.env.PORT)
