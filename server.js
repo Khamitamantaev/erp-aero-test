@@ -3,10 +3,10 @@ const cors = require("cors");
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
-
+const bcrypt = require("bcryptjs");
 const app = express();
 
-var corsOptions = {
+let corsOptions = {
     origin: "http://localhost:8081"
 };
 app.use(cors(corsOptions));
@@ -26,7 +26,7 @@ async function init() {
         where: { id: 'khamitamantaev' },
         defaults: {
             id: 'khamitamantaev',
-            password: '123321',
+            password: bcrypt.hashSync(process.env.ROOT_PASSWORD, 8)
         }
     });
     console.log('created or find user with id: ', user.id)
@@ -34,7 +34,7 @@ async function init() {
 
 //routes
 require('./routes/auth.routes')(app);
-// require('./routes/user.routes')(app);
+require('./routes/user.routes')(app);
 
 // CHECK PORT .ENV
 console.log(process.env.PORT)

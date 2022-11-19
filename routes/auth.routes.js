@@ -14,5 +14,7 @@ module.exports = function (app) {
         controller.signup
     );
 
+    app.post("/signin/:new_token", controller.refresh)
+
     app.post("/signin", controller.signin);
 };

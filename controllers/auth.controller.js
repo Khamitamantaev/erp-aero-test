@@ -1,9 +1,8 @@
 const db = require("../models");
 const config = require("../config/auth.config");
 const User = db.user;
-
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 exports.signup = async (req, res) => {
 
@@ -26,7 +25,6 @@ exports.signup = async (req, res) => {
             .catch(err => {
                 res.status(500).send({ message: err.message });
             });
-        console.log('CREATED')
         res.status(200).send({
             User: createdUser
         })
@@ -44,7 +42,7 @@ exports.signin = (req, res) => {
                 return res.status(404).send({ message: "User Not found." });
             }
 
-            var passwordIsValid = bcrypt.compareSync(
+            let passwordIsValid = bcrypt.compareSync(
                 req.body.password,
                 user.password
             );
@@ -56,17 +54,25 @@ exports.signin = (req, res) => {
                 });
             }
 
-            var token = jwt.sign({ id: user.id }, config.secret, {
-                expiresIn: 600 // 10 min
+            let access_token = jwt.sign({ id: user.id }, config.access_secret, {
+                // expiresIn: 60 // 1 min+
+                expiresIn: 60
             });
+
+            let refresh_token = jwt.sign({ id: user.id }, config.refresh_secret, {
+                expiresIn: 600 // 10 min+
+            });
+
             res.status(200).send({
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                accessToken: token
+                accessToken: access_token,
+                refresh_token: refresh_token
             });
         })
         .catch(err => {
             res.status(500).send({ message: err.message });
         });
 };
+
+exports.refresh = async (req, res) => {
+    console.log(req.params.new_token)
+}
