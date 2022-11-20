@@ -27,7 +27,7 @@ db.sequelize.sync({ force: true }).then(() => {
 });
 
 async function init() {
-     await User.findOrCreate({
+    await User.findOrCreate({
         where: { id: 'khamitamantaev' },
         defaults: {
             id: 'khamitamantaev',
@@ -35,16 +35,21 @@ async function init() {
         }
     });
 
-     await File.bulkCreate([
+    await File.bulkCreate([
         { title: 'Jack', expansion: 'mp3', mimeType: 'audio/mpeg', downloadAt: new Date(), size: 99223 },
-      ]);
+    ]);
 
-      if (!fs.existsSync('Jack.mp3')) {
+    let resources = path.join(__dirname, 'resources')
+    if (!fs.existsSync(resources)) {
+        fs.mkdirSync(resources);
+    }
+
+    if (fs.existsSync('resources')) {
         const filepath = path.join(__dirname, 'resources', 'Jack.mp3')
         fs.writeFile(filepath, '', (err) => {
             if (err) throw err;
-        }); 
-      }
+        });
+    }
 }
 
 //routes
