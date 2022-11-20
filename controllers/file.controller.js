@@ -113,7 +113,7 @@ exports.downloadById = async (req, res) => {
     const id = req.params.id;
     const file = await File.findOne({ where: { id } })
     const filename = file.title + '.' + file.expansion
-    if(!file) {
+    if (!file) {
         res.status(404).send({
             message: `Could not find the file with id: ${id}`,
         });
@@ -128,3 +128,53 @@ exports.downloadById = async (req, res) => {
         });
     }
 }
+
+exports.updateById = async (req, res) => {
+
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).send('No files uploaded to update.');
+    }
+
+    try {
+        let sampleFile = req.files.simple;
+        let resource = path.join(__dirname, '..', 'resources')
+
+        const mainpath = path.join(resource, sampleFile.name)
+
+        if (!fs.existsSync(resource)) {
+            fs.mkdirSync(resource);
+        }
+
+        const words = sampleFile.name.split('.');
+        const [expansion] = words.slice(-1)
+        const findFile = await File.findOne({ where: {id: req.params.id } })
+        if (!findFile) {
+            res.setHeader('Content-Type', 'text/html');
+            res.status(404).send(`File not found to Update!`)
+        } else {
+           await File.update({
+                title: sampleFile.name.slice(0, sampleFile.name.lastIndexOf(".")),
+                expansion: expansion,
+                mimeType: sampleFile.mimetype,
+                size: sampleFile.size,
+                downloadAt: new Date()
+            }, {
+                where: {
+                    id: req.params.id
+                }
+            })
+
+            let resource = path.join(__dirname, '..', 'resources')
+            fs.unlink(path.join(resource, findFile.title + '.' + findFile.expansion), function (err) {
+                if (err) {
+                    throw err
+                }
+            })
+            sampleFile.mv(mainpath);
+            res.setHeader('Content-Type', 'text/html');
+            res.status(200).send('File uploaded!')
+        }
+    } catch (err) {
+        return res.status(500).send(err);
+    }
+};
