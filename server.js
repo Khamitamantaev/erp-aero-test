@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const fileUpload = require('express-fileupload');
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
@@ -9,6 +10,7 @@ const app = express();
 let corsOptions = {
     origin: "http://localhost:8081"
 };
+app.use(fileUpload())
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
