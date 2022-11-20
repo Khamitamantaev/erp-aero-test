@@ -41,20 +41,37 @@ exports.upload = async (req, res) => {
 };
 
 exports.list = async (req, res) => {
-    // console.log(req.params.list_size)
+    const getPagination = (page, size) => {
+        const limit = size ? +size : 3;
+        const offset = page ? page * limit : 0;
 
-    const files = await File.findAndCountAll({
-        limit: 2,
-        offset: 0,
-        where: {}, // conditions
+        return { limit, offset };
+    };
+
+    const getPagingData = (data, page, limit) => {
+        const { count: totalItems, rows: files } = data;
+        const currentPage = page ? + page : 0;
+        const totalPages = Math.ceil(totalItems / limit);
+      
+        return { totalItems, files, totalPages, currentPage };
+      };
+
+    const { page, list_size, title } = req.query;
+    let haveCondition = title ? { title: { [Op.like]: `%${title}%` } } : null;
+
+    const { limit, offset } = getPagination(page, list_size);
+
+    File.findAndCountAll({ where: haveCondition, limit, offset })
+    .then(data => {
+      const response = getPagingData(data, page, limit);
+      res.send(response);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving tutorials."
       });
-
-    if (files.length !== 0) {
-        res.status(200).send(files)
-    } else {
-        res.status(200).send('empty')
-    }
-
+    });
 }
 
 exports.deleteById = async (req, res) => {
