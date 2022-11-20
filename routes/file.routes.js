@@ -9,10 +9,10 @@ module.exports = function(app) {
     next();
   });
 
-  app.post("/file/upload", controller.upload);
-  app.get("/file/list", controller.list);
-  app.delete("/file/delete/:id", controller.deleteById);
-  app.get("/file/:id", controller.getFileById);
-  app.get("/file/download/:id", controller.downloadById);
-  app.put("/file/update/:id", controller.updateById);
+  app.post("/file/upload", [authJwt.verifyToken], controller.upload);
+  app.get("/file/list",[authJwt.verifyToken], controller.list);
+  app.delete("/file/delete/:id",[authJwt.verifyToken], controller.deleteById);
+  app.get("/file/:id",[authJwt.verifyToken], controller.getFileById);
+  app.get("/file/download/:id",[authJwt.verifyToken], controller.downloadById);
+  app.put("/file/update/:id",[authJwt.verifyToken], controller.updateById);
 };

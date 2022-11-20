@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const authConfig = require("../config/auth.config.js");
 
 verifyToken = (req, res, next) => {
- 
+
   try {
     let token = req.header("Authorization");
 
@@ -21,7 +21,10 @@ verifyToken = (req, res, next) => {
         });
       }
       req.userId = decoded.id;
+
       next();
+
+
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

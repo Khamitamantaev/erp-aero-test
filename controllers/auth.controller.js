@@ -147,7 +147,7 @@ exports.refresh = async (req, res) => {
 }
 
 exports.logout = async (req, res) => {
-    const token = req.headers.authorization.substring(7, req.headers.authorization.length);
+    const token = req.session.token
     const decoded = jwt.verify(token, config.access_secret);
     let userId = decoded.id
     let access_token = jwt.sign({ id: userId }, config.access_secret, {
@@ -155,6 +155,7 @@ exports.logout = async (req, res) => {
     });
     try {
         req.session = null;
+        console.log(req.session)
         return res.status(200).json({ message: "You've been signed out!", newToken: access_token });
     } catch (err) {
         this.next(err);

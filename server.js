@@ -18,11 +18,10 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
-    secret: 'keyboard cat',
-    resave: false,
+    secret: process.env.SESSION_SECRET,
+    resave: true,
     saveUninitialized: true
-  }))
-
+}))
 const db = require("./models");
 const User = db.user;
 const File = db.file;
