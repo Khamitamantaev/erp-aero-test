@@ -1,6 +1,7 @@
 const path = require('path')
 const db = require("../models");
 const fs = require('fs');
+const e = require('cors');
 const { file: File } = db;
 exports.upload = async (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
@@ -42,7 +43,7 @@ exports.upload = async (req, res) => {
 
 exports.list = async (req, res) => {
     const getPagination = (page, size) => {
-        const limit = size ? +size : 3;
+        const limit = size ? +size : 10;
         const offset = page ? page * limit : 0;
 
         return { limit, offset };
@@ -50,13 +51,14 @@ exports.list = async (req, res) => {
 
     const getPagingData = (data, page, limit) => {
         const { count: totalItems, rows: files } = data;
-        const currentPage = page ? + page : 0;
+        const currentPage = page ? + page : 1;
         const totalPages = Math.ceil(totalItems / limit);
       
         return { totalItems, files, totalPages, currentPage };
       };
 
-    const { page, list_size, title } = req.query;
+    let { page, list_size, title } = req.query;
+    
     let haveCondition = title ? { title: { [Op.like]: `%${title}%` } } : null;
 
     const { limit, offset } = getPagination(page, list_size);
@@ -69,7 +71,7 @@ exports.list = async (req, res) => {
     .catch(err => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving tutorials."
+          err.message || "Some error."
       });
     });
 }
