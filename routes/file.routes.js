@@ -12,4 +12,5 @@ module.exports = function(app) {
   app.post("/file/upload", controller.upload);
   app.get("/file/list", controller.list);
   app.delete("/file/delete/:id", controller.deleteById);
+  app.get("/file/:id", controller.getFileById);
 };

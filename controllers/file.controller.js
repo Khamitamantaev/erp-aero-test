@@ -91,3 +91,21 @@ exports.deleteById = async (req, res) => {
         res.status(200).send("Delete by ID");
     }
 };
+
+exports.getFileById = async (req, res) => {
+   await File.findOne({ where: {id: req.params.id}})
+    .then(data => {
+      if(!data) {
+        res.status(404).send('Not found')
+      } else {
+        res.send(data);
+      }
+      
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error."
+      });
+    });
+}
