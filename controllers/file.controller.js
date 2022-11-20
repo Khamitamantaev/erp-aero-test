@@ -132,7 +132,7 @@ exports.downloadById = async (req, res) => {
 exports.updateById = async (req, res) => {
 
     if (!req.files || Object.keys(req.files).length === 0) {
-        return res.status(400).send('No files uploaded to update.');
+        return res.status(400).send('No files uploaded for update.');
     }
 
     try {
@@ -147,12 +147,12 @@ exports.updateById = async (req, res) => {
 
         const words = sampleFile.name.split('.');
         const [expansion] = words.slice(-1)
-        const findFile = await File.findOne({ where: {id: req.params.id } })
+        const findFile = await File.findOne({ where: { id: req.params.id } })
         if (!findFile) {
             res.setHeader('Content-Type', 'text/html');
             res.status(404).send(`File not found to Update!`)
         } else {
-           await File.update({
+            await File.update({
                 title: sampleFile.name.slice(0, sampleFile.name.lastIndexOf(".")),
                 expansion: expansion,
                 mimeType: sampleFile.mimetype,
@@ -165,14 +165,17 @@ exports.updateById = async (req, res) => {
             })
 
             let resource = path.join(__dirname, '..', 'resources')
-            fs.unlink(path.join(resource, findFile.title + '.' + findFile.expansion), function (err) {
-                if (err) {
-                    throw err
-                }
-            })
+            if (fs.existsSync(path.join(resource, findFile.title + '.' + findFile.expansion))) {
+                fs.unlink(path.join(resource, findFile.title + '.' + findFile.expansion), function (err) {
+                    if (err) {
+                        throw err
+                    }
+                })
+            }
+
             sampleFile.mv(mainpath);
             res.setHeader('Content-Type', 'text/html');
-            res.status(200).send('File uploaded!')
+            res.status(200).send('File updated successfully!')
         }
     } catch (err) {
         return res.status(500).send(err);
