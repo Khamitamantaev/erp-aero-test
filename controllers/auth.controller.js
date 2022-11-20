@@ -5,10 +5,11 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { validationResult } = require('express-validator');
 
+
 exports.signup = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array() });
     }
     const user = await User.findOne({
         where: {
@@ -47,6 +48,8 @@ exports.signup = async (req, res) => {
                 expiresIn: config.jwtExpiration
             });
 
+
+
             let refresh_token = await RefreshToken.createToken(user);
 
             res.status(200).send({
@@ -61,9 +64,10 @@ exports.signup = async (req, res) => {
 };
 
 exports.signin = (req, res) => {
+    // console.log(req.session)
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array() });
     }
     User.findOne({
         where: {
@@ -91,9 +95,8 @@ exports.signin = (req, res) => {
                 // expiresIn: 60 // 1 min+
                 expiresIn: config.jwtExpiration
             });
-
+            req.session.token = access_token.toString()
             let refresh_token = await RefreshToken.createToken(user);
-
             res.status(200).send({
                 accessToken: access_token,
                 refreshToken: refresh_token
@@ -141,4 +144,20 @@ exports.refresh = async (req, res) => {
     } catch (err) {
         return res.status(500).send({ message: err });
     }
+}
+
+exports.logout = async (req, res) => {
+    const token = req.headers.authorization.substring(7, req.headers.authorization.length);
+    const decoded = jwt.verify(token, config.access_secret);
+    let userId = decoded.id
+    let access_token = jwt.sign({ id: userId }, config.access_secret, {
+        expiresIn: config.jwtExpiration
+    });
+    try {
+        req.session = null;
+        return res.status(200).json({ message: "You've been signed out!", newToken: access_token });
+    } catch (err) {
+        this.next(err);
+    }
+
 }

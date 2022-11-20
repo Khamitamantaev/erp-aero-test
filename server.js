@@ -3,6 +3,7 @@ const cors = require("cors");
 const fileUpload = require('express-fileupload');
 const path = require('path')
 const fs = require('fs')
+const session = require('express-session')
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
@@ -16,6 +17,11 @@ app.use(fileUpload())
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true
+  }))
 
 const db = require("./models");
 const User = db.user;

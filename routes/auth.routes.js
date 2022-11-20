@@ -1,7 +1,7 @@
 const controller = require("../controllers/auth.controller");
 const { body } = require('express-validator');
 const e = require("cors");
-
+const { authJwt } = require("../middleware");
 const validate = (data) => {
     if (!/^([0-9]{9})|([A-Za-z0-9._%\+\-]+@[a-z0-9.\-]+\.[a-z]{2,3})$/.test(data)) {
         return false;
@@ -31,4 +31,6 @@ module.exports = function (app) {
     app.post("/signin", body('id').custom(value => {
         return validate(value)
     }), controller.signin);
+
+    app.get("/logout", [authJwt.verifyToken], controller.logout)
 };

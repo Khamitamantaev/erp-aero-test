@@ -16,4 +16,10 @@ module.exports = function(app) {
     [authJwt.verifyToken],
     controller.privateAccess
   );
+
+  app.get(
+    "/info",
+    [authJwt.verifyToken],
+    controller.getInfo
+  );
 };
