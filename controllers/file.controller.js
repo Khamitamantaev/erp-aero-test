@@ -1,26 +1,37 @@
 const path = require('path')
+const db = require("../models");
 const fs = require('fs');
-exports.upload = (req, res) => {
+const { file: File } = db;
+exports.upload = async (req, res) => {
     console.log(req.files)
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).send('No files uploaded.');
     }
 
-    let sampleFile = req.files.simple;
-
-    const mainpath = path.join(__dirname, '..', 'resources', sampleFile.name)
-
-    if (!fs.existsSync(path.join(__dirname, '..', 'resources'))) {
-        fs.mkdirSync(path.join(__dirname, '..', 'resources'));
-    }
-    //   const fulleName = sampleFile.name.slice(0, sampleFile.name.lastIndexOf("."));
+    try {
+        let sampleFile = req.files.simple;
+        let resource = path.join(__dirname, '..', 'resources')
     
-
-    sampleFile.mv(mainpath, function (err) {
-        if (err)
-            return res.status(500).send(err);
+        const mainpath = path.join(resource, sampleFile.name)
+    
+        if (!fs.existsSync(resource)) {
+            fs.mkdirSync(resource);
+        }
+    
+        const words = sampleFile.name.split('.');
+        const [expansion] = words.slice(-1)
+        await File.create({
+            title: sampleFile.name.slice(0, sampleFile.name.lastIndexOf(".")),
+            expansion: expansion,
+            mimeType: sampleFile.mimetype,
+            size: sampleFile.size,
+            downloadAt: new Date()
+        })
+        sampleFile.mv(mainpath);
         res.send('File uploaded!');
-    });
+    } catch(err) {
+        return res.status(500).send(err);
+    }
 };
 
 exports.list = (req, res) => {
