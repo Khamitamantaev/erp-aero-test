@@ -13,4 +13,5 @@ module.exports = function(app) {
   app.get("/file/list", controller.list);
   app.delete("/file/delete/:id", controller.deleteById);
   app.get("/file/:id", controller.getFileById);
+  app.get("/file/download/:id", controller.downloadById);
 };

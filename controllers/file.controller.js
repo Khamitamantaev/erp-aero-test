@@ -53,27 +53,27 @@ exports.list = async (req, res) => {
         const { count: totalItems, rows: files } = data;
         const currentPage = page ? + page : 1;
         const totalPages = Math.ceil(totalItems / limit);
-      
+
         return { totalItems, files, totalPages, currentPage };
-      };
+    };
 
     let { page, list_size, title } = req.query;
-    
+
     let haveCondition = title ? { title: { [Op.like]: `%${title}%` } } : null;
 
     const { limit, offset } = getPagination(page, list_size);
 
     File.findAndCountAll({ where: haveCondition, limit, offset })
-    .then(data => {
-      const response = getPagingData(data, page, limit);
-      res.send(response);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error."
-      });
-    });
+        .then(data => {
+            const response = getPagingData(data, page, limit);
+            res.send(response);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || "Some error."
+            });
+        });
 }
 
 exports.deleteById = async (req, res) => {
@@ -93,19 +93,38 @@ exports.deleteById = async (req, res) => {
 };
 
 exports.getFileById = async (req, res) => {
-   await File.findOne({ where: {id: req.params.id}})
-    .then(data => {
-      if(!data) {
-        res.status(404).send('Not found')
-      } else {
-        res.send(data);
-      }
-      
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error."
-      });
-    });
+    await File.findOne({ where: { id: req.params.id } })
+        .then(data => {
+            if (!data) {
+                res.status(404).send(`Not found file with id: ${req.params.id}`)
+            } else {
+                res.send(data);
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || "Some error."
+            });
+        });
+}
+
+exports.downloadById = async (req, res) => {
+    const id = req.params.id;
+    const file = await File.findOne({ where: { id } })
+    const filename = file.title + '.' + file.expansion
+    if(!file) {
+        res.status(404).send({
+            message: `Could not find the file with id: ${id}`,
+        });
+    } else {
+        const resource = path.join(__dirname, '..', 'resources/');
+        res.download(resource + filename, filename, (err) => {
+            if (err) {
+                res.status(500).send({
+                    message: "Could not download the file. " + err,
+                });
+            }
+        });
+    }
 }
