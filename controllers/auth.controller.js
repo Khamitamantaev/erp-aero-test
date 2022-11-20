@@ -108,8 +108,6 @@ exports.refresh = async (req, res) => {
 
     const requestToken = req.params.new_token;
 
-    console.log('Current token: ', requestToken)
-
     if (requestToken == null) {
         return res.status(403).json({ message: "Refresh Token is empty!" });
     }

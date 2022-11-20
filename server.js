@@ -22,7 +22,6 @@ const User = db.user;
 const File = db.file;
 
 db.sequelize.sync({ force: true }).then(() => {
-    console.log('Dropped User');
     init();
 });
 
@@ -40,6 +39,20 @@ async function init() {
     ]);
 
     let resources = path.join(__dirname, 'resources')
+    const filesFDB = await File.findAll()
+    fs.readdir(resources, (err, files) => {
+        if (err) throw err;
+        
+        for (const filew of files) {
+            const fileName = filesFDB.find(file => file.title === filew.slice(0, filew.lastIndexOf(".")))
+            if(!fileName) {
+                fs.unlink(path.join(resources, filew), (err) => {
+                    if (err) throw err;
+                });
+            }
+        }
+    });
+
     if (!fs.existsSync(resources)) {
         fs.mkdirSync(resources);
     }
@@ -56,9 +69,6 @@ async function init() {
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/file.routes.js')(app);
-
-// CHECK PORT .ENV
-console.log(process.env.PORT)
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

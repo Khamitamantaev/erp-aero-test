@@ -19,8 +19,8 @@ exports.upload = async (req, res) => {
 
         const words = sampleFile.name.split('.');
         const [expansion] = words.slice(-1)
-        const findFile = await File.findOne({ where: { title: sampleFile.name.slice(0, sampleFile.name.lastIndexOf("."))}})
-        if(!findFile) {
+        const findFile = await File.findOne({ where: { title: sampleFile.name.slice(0, sampleFile.name.lastIndexOf(".")) } })
+        if (!findFile) {
             await File.create({
                 title: sampleFile.name.slice(0, sampleFile.name.lastIndexOf(".")),
                 expansion: expansion,
@@ -35,15 +35,19 @@ exports.upload = async (req, res) => {
             res.setHeader('Content-Type', 'text/html');
             res.status(403).send(`File with name: ${findFile.title} already exist!`)
         }
-       
     } catch (err) {
         return res.status(500).send(err);
     }
 };
 
 exports.list = async (req, res) => {
-    console.log(req.params.list_size)
-    const files = await File.findAll()
+    // console.log(req.params.list_size)
+
+    const files = await File.findAndCountAll({
+        limit: 2,
+        offset: 0,
+        where: {}, // conditions
+      });
 
     if (files.length !== 0) {
         res.status(200).send(files)
@@ -55,7 +59,7 @@ exports.list = async (req, res) => {
 
 exports.deleteById = async (req, res) => {
     const file = await File.findOne({ where: { id: req.params.id } })
-    if(!file) {
+    if (!file) {
         res.status(404).send(`Not found file with id: ${req.params.id}`);
     } else {
         let resource = path.join(__dirname, '..', 'resources')
