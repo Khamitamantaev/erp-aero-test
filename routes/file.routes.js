@@ -10,6 +10,6 @@ module.exports = function(app) {
   });
 
   app.post("/file/upload", controller.upload);
-  app.get("/file/list", controller.list);
+  app.get("/file/list/:list_size", controller.list);
   app.delete("/file/delete/:id", controller.deleteById);
 };

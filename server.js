@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const fileUpload = require('express-fileupload');
+const path = require('path')
+const fs = require('fs')
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
@@ -17,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const db = require("./models");
 const User = db.user;
+const File = db.file;
 
 db.sequelize.sync({ force: true }).then(() => {
     console.log('Dropped User');
@@ -24,14 +27,24 @@ db.sequelize.sync({ force: true }).then(() => {
 });
 
 async function init() {
-    const [user, created] = await User.findOrCreate({
+     await User.findOrCreate({
         where: { id: 'khamitamantaev' },
         defaults: {
             id: 'khamitamantaev',
             password: bcrypt.hashSync(process.env.USER_PASSWORD, 8)
         }
     });
-    console.log('created or find user with id: ', user.id)
+
+     await File.bulkCreate([
+        { title: 'Jack', expansion: 'mp3', mimeType: 'audio/mpeg', downloadAt: new Date(), size: 99223 },
+      ]);
+
+      if (!fs.existsSync('Jack.mp3')) {
+        const filepath = path.join(__dirname, 'resources', 'Jack.mp3')
+        fs.writeFile(filepath, '', (err) => {
+            if (err) throw err;
+        }); 
+      }
 }
 
 //routes
