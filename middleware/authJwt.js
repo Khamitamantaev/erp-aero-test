@@ -5,6 +5,7 @@ verifyToken = (req, res, next) => {
 
   try {
     let token = req.session.token
+
     if (!token) {
       return res.status(403).send("Access Denied");
     }

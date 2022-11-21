@@ -96,6 +96,7 @@ exports.signin = (req, res) => {
                 expiresIn: config.jwtExpiration
             });
             req.session.token = access_token.toString()
+
             let refresh_token = await RefreshToken.createToken(user);
             res.status(200).send({
                 accessToken: access_token,
@@ -154,7 +155,7 @@ exports.logout = async (req, res) => {
         expiresIn: config.jwtExpiration
     });
     try {
-        req.session.destroy()
+        req.session.token = null
         console.log(req.session)
         return res.status(200).json({ message: "You've been signed out!", newToken: access_token });
     } catch (err) {
