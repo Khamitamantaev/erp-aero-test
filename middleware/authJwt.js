@@ -5,7 +5,10 @@ verifyToken = (req, res, next) => {
 
   try {
     let token = req.header("Authorization");
-
+    // После выходе(logout) этот токен сохраняется. Это единственное что я не понял здесь.
+    // Если я напишу здесь таким образом: let token = req.session.token
+    // Он будет такой же, как и до выхода, а не undefined или null
+    // Буду признателен, если поможете разобраться.
     if (!token) {
       return res.status(403).send("Access Denied");
     }
