@@ -4,11 +4,7 @@ const authConfig = require("../config/auth.config.js");
 verifyToken = (req, res, next) => {
 
   try {
-    let token = req.header("Authorization");
-    // После выходе(logout) этот токен сохраняется. Это единственное что я не понял здесь.
-    // Если я напишу здесь таким образом: let token = req.session.token
-    // Он будет такой же, как и до выхода, а не undefined или null
-    // Буду признателен, если поможете разобраться.
+    let token = req.session.token
     if (!token) {
       return res.status(403).send("Access Denied");
     }
@@ -24,10 +20,7 @@ verifyToken = (req, res, next) => {
         });
       }
       req.userId = decoded.id;
-
       next();
-
-
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

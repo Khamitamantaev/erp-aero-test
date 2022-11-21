@@ -154,7 +154,7 @@ exports.logout = async (req, res) => {
         expiresIn: config.jwtExpiration
     });
     try {
-        req.session = null;
+        req.session.destroy()
         console.log(req.session)
         return res.status(200).json({ message: "You've been signed out!", newToken: access_token });
     } catch (err) {
